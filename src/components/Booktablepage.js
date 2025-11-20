@@ -21,7 +21,10 @@ export default function Booktablepage() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5149/booking', form);
+      const jwt = sessionStorage.getItem('jwt');
+      await axios.post('http://localhost:5149/booking', form, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
       // Save email to localStorage for user identification
       if (form.email) {
         localStorage.setItem('userEmail', form.email);

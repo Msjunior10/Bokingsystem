@@ -14,14 +14,28 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [jwt, setJwt] = useState(() => sessionStorage.getItem('jwt'));
+  const [isAuthenticated, setIsAuthenticated] = useState(!!jwt);
+
   useEffect(() => {
-    setIsAuthenticated(!!sessionStorage.getItem('jwt'));
+    function checkAuth() {
+      const token = sessionStorage.getItem('jwt');
+      setJwt(token);
+      setIsAuthenticated(!!token);
+    }
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
   }, []);
 
   function handleLogin() {
-    setIsAuthenticated(true);
+    const token = sessionStorage.getItem('jwt');
+    setJwt(token);
+    setIsAuthenticated(!!token);
   }
+
+  useEffect(() => {
+    setIsAuthenticated(!!jwt);
+  }, [jwt]);
 
   if (!isAuthenticated) {
     return (

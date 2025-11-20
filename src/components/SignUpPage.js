@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 export default function SignUpPage(props) {
-  const [form, setForm] = useState({ name: '', username: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -27,7 +27,12 @@ export default function SignUpPage(props) {
     <div className="booking-form-container">
       <h1>Sign Up</h1>
       {success ? (
-        <p style={{ color: '#00c853', fontWeight: 'bold', textAlign: 'center' }}>Registration successful! You can now log in.</p>
+        <p style={{ color: '#00c853', fontWeight: 'bold', textAlign: 'center' }}>
+          Registration successful! You can now{' '}
+          <a href="/login" style={{ color: '#db5275', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}>
+            log in.
+          </a>
+        </p>
       ) : (
         <form className="booking-form" onSubmit={handleSubmit}>
           <label>
@@ -35,8 +40,8 @@ export default function SignUpPage(props) {
             <input type="text" name="name" value={form.name} onChange={handleChange} required />
           </label>
           <label>
-            Username:
-            <input type="text" name="username" value={form.username} onChange={handleChange} required />
+            Email:
+            <input type="email" name="email" value={form.email} onChange={handleChange} required />
           </label>
           <label>
             Password:
@@ -45,6 +50,14 @@ export default function SignUpPage(props) {
           <button type="submit">Register</button>
           {error && <div style={{ color: '#db5275', fontWeight: 'bold', marginTop: '8px', textAlign: 'center' }}>{error}</div>}
         </form>
+      )}
+      {!success && (
+        <div style={{ marginTop: '18px', textAlign: 'center' }}>
+          <span>Already have an account? </span>
+          <a href="/login" style={{ color: '#db5275', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer' }}>
+            Log in here
+          </a>
+        </div>
       )}
     </div>
   );

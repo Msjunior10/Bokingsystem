@@ -4,7 +4,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // JWT config
-var jwtKey = "super_secret_jwt_key_12345"; // Byt till säkrare i prod
+var jwtKey = "super_secret_jwt_key_12345_very_long_and_secure_key_67890"; // Byt till säkrare i prod
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

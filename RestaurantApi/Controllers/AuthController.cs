@@ -12,7 +12,7 @@ using System.Text;
 public class AuthController : ControllerBase
 {
     private readonly string _connectionString = "Data Source=DB/Resturant.db";
-    private readonly string jwtKey = "super_secret_jwt_key_12345"; // Byt till säkrare i prod
+    private readonly string jwtKey = "super_secret_jwt_key_12345_very_long_and_secure_key_67890"; // Byt till säkrare i prod
 
     [HttpPost("register")]
     public IActionResult Register([FromBody] UserRegisterDto dto)
@@ -21,19 +21,19 @@ public class AuthController : ControllerBase
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         var checkCmd = connection.CreateCommand();
-        checkCmd.CommandText = "SELECT COUNT(*) FROM users WHERE username = $username";
-        checkCmd.Parameters.AddWithValue("$username", dto.Username);
+        checkCmd.CommandText = "SELECT COUNT(*) FROM users WHERE email = $email";
+        checkCmd.Parameters.AddWithValue("$email", dto.Email);
         var exists = (long)checkCmd.ExecuteScalar() > 0;
-        if (exists) return BadRequest("Username already exists");
+        if (exists) return BadRequest("Email already exists");
 
         // Hasha lösenordet
         var passwordHash = HashPassword(dto.Password);
 
         // Spara användaren
         var cmd = connection.CreateCommand();
-        cmd.CommandText = "INSERT INTO users (name, username, passwordhash) VALUES ($name, $username, $passwordhash)";
+        cmd.CommandText = "INSERT INTO users (name, email, passwordhash) VALUES ($name, $email, $passwordhash)";
         cmd.Parameters.AddWithValue("$name", dto.Name);
-        cmd.Parameters.AddWithValue("$username", dto.Username);
+        cmd.Parameters.AddWithValue("$email", dto.Email);
         cmd.Parameters.AddWithValue("$passwordhash", passwordHash);
         cmd.ExecuteNonQuery();
         return Ok();
@@ -45,15 +45,15 @@ public class AuthController : ControllerBase
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         var cmd = connection.CreateCommand();
-        cmd.CommandText = "SELECT id, name, username, passwordhash FROM users WHERE username = $username";
-        cmd.Parameters.AddWithValue("$username", dto.Username);
+        cmd.CommandText = "SELECT id, name, email, passwordhash FROM users WHERE email = $email";
+        cmd.Parameters.AddWithValue("$email", dto.Email);
         using var reader = cmd.ExecuteReader();
         if (!reader.Read()) return Unauthorized("Invalid credentials");
         var user = new User
         {
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
-            Username = reader.GetString(2),
+            Email = reader.GetString(2),
             PasswordHash = reader.GetString(3)
         };
         if (!Verify(dto.Password, user.PasswordHash))
@@ -68,26 +68,26 @@ public class AuthController : ControllerBase
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Username)
+                new Claim(ClaimTypes.Email, user.Email)
             }),
             Expires = DateTime.UtcNow.AddHours(12),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var jwt = tokenHandler.WriteToken(token);
-        return Ok(new { token = jwt, name = user.Name, username = user.Username });
+        return Ok(new { token = jwt, name = user.Name, email = user.Email });
     }
 }
 
 public class UserRegisterDto
 {
     public string? Name { get; set; }
-    public string? Username { get; set; }
+    public string? Email { get; set; }
     public string? Password { get; set; }
 }
 
 public class UserLoginDto
 {
-    public string? Username { get; set; }
+    public string? Email { get; set; }
     public string? Password { get; set; }
 }

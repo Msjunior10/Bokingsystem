@@ -8,7 +8,9 @@ export default function AvailableBookingsPage() {
 
   useEffect(() => {
     if (!date) return;
-    axios.get(`http://localhost:5149/available-times?date=${date}`)
+    const jwt = sessionStorage.getItem('jwt');
+    axios.get(`http://localhost:5149/available-times?date=${date}`,
+      jwt ? { headers: { Authorization: `Bearer ${jwt}` } } : undefined)
       .then(res => setAvailableTimes(res.data))
       .catch(() => setAvailableTimes([]));
   }, [date]);

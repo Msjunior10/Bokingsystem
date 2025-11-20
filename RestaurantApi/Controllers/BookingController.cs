@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using RestaurantApi.Models;
 
+
 [ApiController]
 [Route("[controller]")]
+[Microsoft.AspNetCore.Authorization.Authorize]
 public class BookingController : ControllerBase
 {
     private readonly string _connectionString = "Data Source=DB/Resturant.db";
@@ -11,11 +13,14 @@ public class BookingController : ControllerBase
     [HttpGet]
     public IActionResult GetAll()
     {
+        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
         var bookings = new List<Booking>();
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         var command = connection.CreateCommand();
-        command.CommandText = "SELECT id, name, email, date, time, guests, duration FROM bookings";
+        command.CommandText = "SELECT id, name, email, date, time, guests, duration FROM bookings WHERE email = $email";
+        command.Parameters.AddWithValue("$email", userEmail);
         using var reader = command.ExecuteReader();
         while (reader.Read())
         {
@@ -37,12 +42,14 @@ public class BookingController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] Booking booking)
     {
+        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         var command = connection.CreateCommand();
         command.CommandText = @"INSERT INTO bookings (name, email, date, time, guests, duration) VALUES ($name, $email, $date, $time, $guests, $duration);";
         command.Parameters.AddWithValue("$name", booking.Name);
-        command.Parameters.AddWithValue("$email", booking.Email);
+        command.Parameters.AddWithValue("$email", userEmail);
         command.Parameters.AddWithValue("$date", booking.Date);
         command.Parameters.AddWithValue("$time", booking.Time);
         command.Parameters.AddWithValue("$guests", booking.Guests);
@@ -55,11 +62,14 @@ public class BookingController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         var command = connection.CreateCommand();
-        command.CommandText = "DELETE FROM bookings WHERE id = $id";
+        command.CommandText = "DELETE FROM bookings WHERE id = $id AND email = $email";
         command.Parameters.AddWithValue("$id", id);
+        command.Parameters.AddWithValue("$email", userEmail);
         int rowsAffected = command.ExecuteNonQuery();
         if (rowsAffected == 0)
             return NotFound();
@@ -70,18 +80,19 @@ public class BookingController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Update(int id, [FromBody] Booking booking)
     {
-        Console.WriteLine($"PUT /booking/{{id}}: id={{id}}, date={{booking.Date}}, time={{booking.Time}}, guests={{booking.Guests}}, duration={{booking.Duration}} ");
+        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         var command = connection.CreateCommand();
-        command.CommandText = @"UPDATE bookings SET date = $date, time = $time, guests = $guests, duration = $duration WHERE id = $id";
+        command.CommandText = @"UPDATE bookings SET date = $date, time = $time, guests = $guests, duration = $duration WHERE id = $id AND email = $email";
         command.Parameters.AddWithValue("$date", booking.Date);
         command.Parameters.AddWithValue("$time", booking.Time);
         command.Parameters.AddWithValue("$guests", booking.Guests);
         command.Parameters.AddWithValue("$duration", booking.Duration);
         command.Parameters.AddWithValue("$id", id);
+        command.Parameters.AddWithValue("$email", userEmail);
         int rowsAffected = command.ExecuteNonQuery();
-        Console.WriteLine($"Rows affected: {rowsAffected}");
         if (rowsAffected == 0)
             return NotFound();
         return NoContent();

@@ -7,7 +7,10 @@ export default function MyBookingsPage() {
   const [editForm, setEditForm] = useState({ name: '', email: '', date: '', time: '', guests: 1, duration: 1 });
 
   useEffect(() => {
-    axios.get('http://localhost:5149/booking')
+    const jwt = sessionStorage.getItem('jwt');
+    axios.get('http://localhost:5149/booking', {
+      headers: { Authorization: `Bearer ${jwt}` }
+    })
       .then(res => setBookings(res.data))
       .catch(() => setBookings([]));
   }, []);
@@ -16,7 +19,10 @@ export default function MyBookingsPage() {
     const confirmDelete = window.confirm('Are you sure you want to delete this booking?');
     if (!confirmDelete) return;
     try {
-      await axios.delete(`http://localhost:5149/booking/${id}`);
+      const jwt = sessionStorage.getItem('jwt');
+      await axios.delete(`http://localhost:5149/booking/${id}`, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
       setBookings(bookings.filter(b => b.id !== id));
     } catch (error) {
       alert('Kunde inte ta bort bokningen!');
@@ -45,7 +51,10 @@ export default function MyBookingsPage() {
     e.preventDefault();
     console.log('editingId:', editingId, 'editForm:', editForm);
     try {
-      await axios.put(`http://localhost:5149/booking/${editingId}`, editForm);
+      const jwt = sessionStorage.getItem('jwt');
+      await axios.put(`http://localhost:5149/booking/${editingId}`, editForm, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
       setBookings(bookings.map(b => b.id === editingId ? { ...b, ...editForm } : b));
       setEditingId(null);
     } catch (error) {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 export default function LoginPage(props) {
-  const [form, setForm] = useState({ username: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
   function handleChange(e) {
@@ -15,11 +15,11 @@ export default function LoginPage(props) {
     setError('');
     try {
       const res = await axios.post('http://localhost:5149/auth/login', form);
-      const { token, name, username } = res.data;
+      const { token, name, email } = res.data;
       sessionStorage.setItem('jwt', token);
-      sessionStorage.setItem('username', username);
+      sessionStorage.setItem('email', email);
       sessionStorage.setItem('name', name);
-      if (props.onLogin) props.onLogin({ token, name, username });
+      if (props.onLogin) props.onLogin({ token, name, email });
     } catch (err) {
       setError(err.response?.data || 'Login failed');
     }
@@ -30,8 +30,8 @@ export default function LoginPage(props) {
       <h1>Login</h1>
       <form className="booking-form" onSubmit={handleSubmit}>
         <label>
-          Username:
-          <input type="text" name="username" value={form.username} onChange={handleChange} required />
+          Email:
+          <input type="email" name="email" value={form.email} onChange={handleChange} required />
         </label>
         <label>
           Password:

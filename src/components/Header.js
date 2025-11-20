@@ -6,6 +6,12 @@ import Themebutton from './Themebutton';
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const handleMenuLinkClick = () => setMenuOpen(false);
+    function handleLogout() {
+        sessionStorage.removeItem('jwt');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('name');
+        window.location.href = '/login';
+    }
     return (
         <header className="Header">
             <nav className="nav-desktop">
@@ -21,6 +27,11 @@ export default function Header() {
                 <ul className='Ul'>
                     <Link style={{ textDecoration: 'none', color: 'black' }} to="/my-bookings">My bookings</Link>
                 </ul>
+                <ul className='Ul'>
+                    <button className= "logout-button" onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#db5275', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>
+                        Log out
+                    </button>
+                </ul>
             </nav>
             <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(m => !m)} aria-label="Toggle menu">
                 <span className="bar"></span>
@@ -33,6 +44,11 @@ export default function Header() {
                     <ul className='Ul'><Link to="/booktable" onClick={handleMenuLinkClick}>Book a table</Link></ul>
                     <ul className='Ul'><Link to="/available-bookings" onClick={handleMenuLinkClick}>Available booking times</Link></ul>
                     <ul className='Ul'><Link to="/my-bookings" onClick={handleMenuLinkClick}>My bookings</Link></ul>
+                    <ul className='Ul'>
+                        <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#db5275', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>
+                            Log out
+                        </button>
+                    </ul>
                 </nav>
             )}
             <Themebutton />

@@ -674,6 +674,9 @@ ul:hover {
   transition: transform 0.3s ease-in-out 0.1s;
   transform: translate(0);
 }
+.logout-button{
+  margin-right: 50px;
+}
 
 @keyframes text-rotation {
   to {
