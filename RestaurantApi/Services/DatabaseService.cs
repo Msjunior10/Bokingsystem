@@ -21,6 +21,12 @@ public class DatabaseService
                 guests INTEGER NOT NULL,
                 duration INTEGER NOT NULL DEFAULT 1
             );
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                username TEXT NOT NULL UNIQUE,
+                passwordhash TEXT NOT NULL
+            );
         ";
         command.ExecuteNonQuery();
 
