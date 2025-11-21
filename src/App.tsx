@@ -3,6 +3,7 @@ import './App.css';
 import Header from './components/Header';
 import './components.css';
 import { Routes, Route } from 'react-router-dom';
+
 import Booktablepage from './components/Booktablepage';
 import AvailableBookingsPage from './components/AvailableBookingsPage';
 import MyBookingsPage from './components/MyBookingsPage';
@@ -10,6 +11,7 @@ import Gifdiv from './components/Gifdiv';
 import Footer from './components/footer';
 import SignUpPage from './components/SignUpPage';
 import LoginPage from './components/LoginPage';
+import AdminBookingsPage from './components/AdminBookingsPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -37,6 +39,16 @@ function App() {
     setIsAuthenticated(!!jwt);
   }, [jwt]);
 
+
+  // Kontrollera om användaren är admin (JWT payload)
+  let isAdmin = false;
+  if (jwt) {
+    try {
+      const payload = JSON.parse(atob(jwt.split('.')[1]));
+      isAdmin = payload["role"] === 'admin';
+    } catch {}
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="App">
@@ -51,12 +63,13 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
+      <Header isAdmin={isAdmin} />
       <Routes>
         <Route path="/" element={<Gifdiv />} />
         <Route path="/booktable" element={<Booktablepage />} />
         <Route path="/available-bookings" element={<AvailableBookingsPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
+        {isAdmin && <Route path="/admin-bookings" element={<AdminBookingsPage />} />}
       </Routes>
       <Footer />
     </div>

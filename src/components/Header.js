@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import Themebutton from './Themebutton';
 
-export default function Header() {
+export default function Header({ isAdmin }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const handleMenuLinkClick = () => setMenuOpen(false);
     function handleLogout() {
@@ -27,6 +27,11 @@ export default function Header() {
                 <ul className='Ul'>
                     <Link style={{ textDecoration: 'none', color: 'black' }} to="/my-bookings">My bookings</Link>
                 </ul>
+                {isAdmin && (
+                  <ul className='Ul'>
+                    <Link style={{ textDecoration: 'none', color: '#db5275', fontWeight: 'bold' }} to="/admin-bookings">Admin: All bookings</Link>
+                  </ul>
+                )}
                 <ul className='Ul'>
                     <button className= "logout-button" onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#db5275', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>
                         Log out
@@ -44,6 +49,9 @@ export default function Header() {
                     <ul className='Ul'><Link to="/booktable" onClick={handleMenuLinkClick}>Book a table</Link></ul>
                     <ul className='Ul'><Link to="/available-bookings" onClick={handleMenuLinkClick}>Available booking times</Link></ul>
                     <ul className='Ul'><Link to="/my-bookings" onClick={handleMenuLinkClick}>My bookings</Link></ul>
+                    {isAdmin && (
+                      <ul className='Ul'><Link to="/admin-bookings" onClick={handleMenuLinkClick} style={{ color: '#db5275', fontWeight: 'bold' }}>Admin: All bookings</Link></ul>
+                    )}
                     <ul className='Ul'>
                         <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#db5275', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>
                             Log out
